@@ -11,7 +11,28 @@ const configPath = join(currentDir, "wrangler.jsonc");
 const schemaPath = join(currentDir, "schema.sql");
 const logPath = join(currentDir, "wrangler.log");
 
-if (!process.env.CLOUDFLARE_API_TOKEN) {
+function normalizeApiToken(value) {
+  let token = String(value ?? "").trim();
+  token = token.replace(/^CLOUDFLARE_API_TOKEN\s*=\s*/i, "").trim();
+  token = token.replace(/^Authorization\s*:\s*/i, "").trim();
+  token = token.replace(/^Bearer\s+/i, "").trim();
+
+  const isWrapped =
+    (token.startsWith('"') && token.endsWith('"')) ||
+    (token.startsWith("'") && token.endsWith("'"));
+  if (isWrapped) {
+    token = token.slice(1, -1).trim();
+  }
+
+  return token.replace(/^Bearer\s+/i, "").trim();
+}
+
+const normalizedApiToken = normalizeApiToken(
+  process.env.CLOUDFLARE_API_TOKEN,
+);
+process.env.CLOUDFLARE_API_TOKEN = normalizedApiToken;
+
+if (!normalizedApiToken) {
   throw new Error(
     "O secret CLOUDFLARE_API_TOKEN ainda não foi configurado no GitHub.",
   );
