@@ -2,6 +2,11 @@ name: Ativar Catálogo Marsom
 
 on:
   workflow_dispatch:
+  push:
+    branches:
+      - main
+    paths:
+      - ".github/workflows/ativar-catalogo-marsom.yml"
 
 permissions:
   contents: read
