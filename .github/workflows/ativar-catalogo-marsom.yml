@@ -1,0 +1,29 @@
+name: Ativar Catálogo Marsom
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  publicar-api:
+    name: Publicar banco e mídias
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    env:
+      CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+      CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+      CATALOGO_EDIT_KEY: ${{ secrets.CATALOGO_EDIT_KEY }}
+
+    steps:
+      - name: Baixar o projeto
+        uses: actions/checkout@v4
+
+      - name: Preparar Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+
+      - name: Criar recursos e publicar
+        run: node catalogo-marsom-cloudflare/setup-cloudflare.mjs
